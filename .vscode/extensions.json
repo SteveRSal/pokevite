@@ -1,0 +1,19 @@
+{
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "editorconfig.editorconfig",
+    "bradlc.vscode-tailwindcss",
+    "eamodio.gitlens",
+    "csstools.postcss",
+    "jock.svg",
+    "mikestead.dotenv",
+    "streetsidesoftware.code-spell-checker",
+    "streetsidesoftware.code-spell-checker-spanish",
+    "naumovs.color-highlight",
+    "vitest.explorer",
+    "styled-components.vscode-styled-components",
+    "redhat.vscode-yaml",
+    "redhat.vscode-xml"
+  ]
+}
