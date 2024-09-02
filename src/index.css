@@ -2,28 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Asegúrate de que el HTML, el body y el contenedor raíz ocupen toda la pantalla */
-html,
-body,
-#root {
-  min-height: 100vh;
-  margin: 0;
-  padding: 0;
-  justify-content: center;
-  align-items: center;
-  background-color: #f4f4f4; /* Fondo rojo para toda la pantalla */
-}
+
 
 body {
   font-family: 'Arial', sans-serif; /* Fuente por defecto */
 }
 
-/* Asegura que el contenedor principal siempre esté centrado */
-#root > div {
-  width: 100%;
-  max-width: 1200px; /* Ajuste opcional para pantallas grandes */
-  padding: 0.5rem; /* Espacio alrededor para evitar que los bordes de la pantalla lo toquen */
-}
+
 
 @keyframes fadeIn {
   from {
@@ -70,5 +55,39 @@ body {
   }
   50% {
     transform: scale(1);
+  }
+}
+
+/* Estilos generales para el header en dispositivos móviles */
+header {
+  width: 100%;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f87171; /* color rojo */
+}
+
+/* Media Query para pantallas más grandes que dispositivos móviles */
+@media (min-width: 768px) {
+  header {
+    width: 60%; /* Ajusta el ancho del header en pantallas grandes */
+    padding: 0.5rem; /* Reduce el padding para pantallas más grandes */
+    margin: 0 auto; /* Centra el header horizontalmente */
+    flex-direction: row; /* Cambia a fila en pantallas grandes */
+    justify-content: space-between; /* Espacia los elementos en los extremos */
+  }
+
+  /* Estilos para el contenedor del SearchBar */
+  .searchbar-container {
+    width: 50%; /* Limita el ancho del SearchBar a la mitad del header */
+    max-width: 400px; /* Opcional: máximo ancho */
+  }
+
+  /* Estilos para el botón de favoritos */
+  .favorites-button {
+    width: auto; /* Permite que el botón tenga un ancho automático */
+    max-width: 150px; /* Limita el ancho máximo del botón */
   }
 }

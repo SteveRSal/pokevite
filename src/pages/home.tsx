@@ -16,16 +16,19 @@ const Home: React.FC = () => {
   const [offset, setOffset] = useState<number>(0);
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [loadingDetail, setLoadingDetail] = useState<boolean>(false);
-  const [loadingSearch, setLoadingSearch] = useState<boolean>(false); // Estado para la carga de búsqueda
+  const [loadingSearch, setLoadingSearch] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [filteredPokemonList, setFilteredPokemonList] = useState<
     Pokemon[] | null
   >(null);
   const [selectedPokemon, setSelectedPokemon] = useState<any | null>(null);
   const [sortOption, setSortOption] = useState<'name' | 'number' | null>(null);
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [showFavorites, setShowFavorites] = useState<boolean>(false);
 
   useEffect(() => {
     fetchPokemonList();
+    loadFavorites();
   }, [offset]);
 
   const fetchPokemonList = async () => {
@@ -44,17 +47,35 @@ const Home: React.FC = () => {
     }
   };
 
+  const loadFavorites = () => {
+    const storedFavorites = localStorage.getItem('favorites');
+    if (storedFavorites) {
+      setFavorites(JSON.parse(storedFavorites));
+    }
+  };
+
+  const toggleFavorite = (name: string) => {
+    let updatedFavorites;
+    if (favorites.includes(name)) {
+      updatedFavorites = favorites.filter((fav) => fav !== name);
+    } else {
+      updatedFavorites = [...favorites, name];
+    }
+    setFavorites(updatedFavorites);
+    localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+  };
+
   const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchTerm(value);
-    setOffset(0); // Reiniciar el offset al cambiar el término de búsqueda
+    setOffset(0);
 
     if (value === '') {
-      setFilteredPokemonList(null); // Reinicia el filtro a null para mostrar la lista completa
+      setFilteredPokemonList(null);
       return;
     }
 
-    setLoadingSearch(true); // Iniciar carga de búsqueda
+    setLoadingSearch(true);
 
     const localFiltered = pokemonList.filter((pokemon) =>
       pokemon.name.toLowerCase().includes(value.toLowerCase()),
@@ -76,16 +97,15 @@ const Home: React.FC = () => {
       }
     }
 
-    setLoadingSearch(false); // Finalizar carga de búsqueda
+    setLoadingSearch(false);
   };
 
   const handleSortChange = (option: 'name' | 'number') => {
     setSortOption(option);
-    setOffset(0); // Reiniciar el offset al cambiar la opción de ordenación
-    setFilteredPokemonList(null); // Reiniciar la lista filtrada para aplicar la ordenación en la lista completa
+    setOffset(0);
+    setFilteredPokemonList(null);
   };
 
-  // Ordenar la lista basada en la opción seleccionada
   const getSortedPokemonList = (list: Pokemon[]) => {
     if (sortOption === 'name') {
       return [...list].sort((a, b) => a.name.localeCompare(b.name));
@@ -122,11 +142,9 @@ const Home: React.FC = () => {
     setLoadingDetail(true);
 
     try {
-      // Verificar si ya tenemos todos los detalles necesarios
       const existingPokemon = pokemonList.find((p) => p.name === pokemon.name);
 
       if (!existingPokemon || !existingPokemon.url.includes('sprites')) {
-        // Obtener detalles adicionales si no están disponibles
         const detail = await getPokemonDetailByNameOrNumber(pokemon.name);
         setSelectedPokemon({
           name: detail.name,
@@ -139,12 +157,11 @@ const Home: React.FC = () => {
           imageUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${detail.id}.png`,
         });
       } else {
-        // Si los detalles ya están completos, simplemente selecciona el Pokémon
         const number = parseInt(pokemon.url.split('/').filter(Boolean).pop()!);
         setSelectedPokemon({
           name: pokemon.name,
           id: number,
-          weight: 0, // Valores temporales
+          weight: 0,
           height: 0,
           abilities: [],
           types: [],
@@ -159,33 +176,49 @@ const Home: React.FC = () => {
     }
   };
 
-  // Determinar qué lista mostrar: completa, filtrada o ordenada
   const displayList = getSortedPokemonList(
     filteredPokemonList !== null ? filteredPokemonList : pokemonList,
   );
 
+  const favoriteList = pokemonList.filter((pokemon) =>
+    favorites.includes(pokemon.name),
+  );
+
   return (
     <div className="flex min-h-screen w-full items-start justify-center bg-red-500">
-      {/* Ajuste de ancho para pantallas grandes */}
       <div className="mx-auto w-full max-w-6xl rounded-b-3xl bg-red-500 p-4 shadow-lg lg:p-8">
-        <header className="sticky top-0 z-50 flex w-full flex-col items-center justify-between bg-red-500 p-4 lg:w-full lg:flex-row lg:justify-between">
-          <SearchBar
-            searchTerm={searchTerm}
-            onSearchChange={handleSearchChange}
-            onSortChange={handleSortChange}
-          />
-        </header>
+      <header className="sticky top-0 z-50 flex w-full flex-col items-center justify-between bg-red-500 p-4 lg:flex-row lg:items-center lg:justify-between lg:max-w-[50%] lg:mx-auto lg:p-2 lg:gap-4">
+  <div className="w-full lg:w-1/">
+    {/* Contenedor del SearchBar ajustado para pantallas grandes */}
+    <SearchBar
+      searchTerm={searchTerm}
+      onSearchChange={handleSearchChange}
+      onSortChange={handleSortChange}
+    />
+  </div>
+
+  {/* Botón para mostrar favoritos */}
+  <button
+    onClick={() => setShowFavorites(!showFavorites)}
+    className="mt-4 bg-white py-2 px-4 rounded-lg shadow-md lg:mt-0 lg:w-1/2 lg:max-w-[150px]"
+  >
+    {showFavorites ? 'Mostrar Todos' : 'Mostrar Favoritos'}
+  </button>
+</header>
+
         <div className="rounded-3xl bg-white p-4 shadow-lg lg:p-6">
-          {loadingSearch ? ( // Mostrar indicador de carga de búsqueda
+          {loadingSearch ? (
             <p className="text-center">Buscando Pokémon...</p>
           ) : (
             <div className="grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10">
-              {displayList.map((pokemon) => (
+              {(showFavorites ? favoriteList : displayList).map((pokemon) => (
                 <PokemonCard
                   key={pokemon.name}
                   name={pokemon.name}
                   url={pokemon.url}
                   onClick={() => handleCardClick(pokemon)}
+                  isFavorite={favorites.includes(pokemon.name)}
+                  toggleFavorite={toggleFavorite}
                 />
               ))}
             </div>

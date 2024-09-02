@@ -3,10 +3,18 @@ import React from 'react';
 type PokemonCardProps = {
   name: string;
   url: string;
-  onClick: () => void; // Añadido onClick para manejar el evento de clic
+  onClick: () => void;
+  isFavorite: boolean; // Propiedad para indicar si es favorito
+  toggleFavorite: (name: string) => void; // Función para alternar el estado de favorito
 };
 
-const PokemonCard: React.FC<PokemonCardProps> = ({ name, url, onClick }) => {
+const PokemonCard: React.FC<PokemonCardProps> = ({
+  name,
+  url,
+  onClick,
+  isFavorite,
+  toggleFavorite,
+}) => {
   const getPokemonIdFromUrl = (url: string) => {
     const parts = url.split('/');
     return parts[parts.length - 2];
@@ -20,6 +28,19 @@ const PokemonCard: React.FC<PokemonCardProps> = ({ name, url, onClick }) => {
       className="relative flex cursor-pointer flex-col items-center overflow-hidden rounded-xl bg-white p-3 shadow-md transition-shadow duration-300 hover:shadow-xl"
       onClick={onClick} // Manejar clic
     >
+      {/* Botón de favorito */}
+      <button
+        className={`absolute left-2 top-2 z-30 text-xl ${
+          isFavorite ? 'text-yellow-500' : 'text-gray-400'
+        }`}
+        onClick={(e) => {
+          e.stopPropagation(); // Evitar que el clic active el onClick del card
+          toggleFavorite(name);
+        }}
+      >
+        {isFavorite ? '★' : '☆'} {/* Estrella llena para favorito, estrella vacía para no favorito */}
+      </button>
+
       {/* ID del Pokémon */}
       <span className="absolute right-2 top-2 z-20 text-sm text-gray-400">
         #{pokemonId}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 type PokemonDetailProps = {
   id: number;
@@ -56,24 +56,20 @@ const PokemonDetail: React.FC<PokemonDetailProps> = ({
   const mainType = types[0]?.type.name;
   const mainColor = typeColors[mainType] || '#AAA67F';
 
-  // Recuperar estado de favorito de localStorage
   const [isFavorite, setIsFavorite] = useState<boolean>(() => {
     const storedFavorites = localStorage.getItem('favorites');
     const favorites = storedFavorites ? JSON.parse(storedFavorites) : [];
     return favorites.includes(id);
   });
 
-  // Función para alternar el estado de favorito y guardarlo en localStorage
   const handleFavoriteToggle = () => {
     const storedFavorites = localStorage.getItem('favorites');
     const favorites = storedFavorites ? JSON.parse(storedFavorites) : [];
 
     if (favorites.includes(id)) {
-      // Si ya es favorito, eliminarlo de la lista
       const newFavorites = favorites.filter((favId: number) => favId !== id);
       localStorage.setItem('favorites', JSON.stringify(newFavorites));
     } else {
-      // Si no es favorito, añadirlo a la lista
       const newFavorites = [...favorites, id];
       localStorage.setItem('favorites', JSON.stringify(newFavorites));
     }
@@ -84,14 +80,15 @@ const PokemonDetail: React.FC<PokemonDetailProps> = ({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ backgroundColor: mainColor }} // Fondo dinámico según el tipo
+      style={{ backgroundColor: mainColor }}
     >
       <div
-        className="relative flex h-screen w-full max-w-lg flex-col overflow-hidden shadow-lg md:h-auto md:max-h-[90vh]"
+        className="relative flex h-screen w-full max-w-lg flex-col overflow-hidden shadow-lg md:h-auto md:max-h-[90vh] md:flex-row md:max-w-3xl md:p-4"
         style={{ padding: 0, margin: 0 }}
       >
+        {/* Contenedor de la imagen y la cabecera */}
         <div
-          className="relative flex w-full flex-col justify-start p-4"
+          className="relative flex w-full flex-col justify-start p-4 md:w-1/2"
           style={{
             backgroundColor: mainColor,
             height: '35%',
@@ -121,7 +118,7 @@ const PokemonDetail: React.FC<PokemonDetailProps> = ({
           </button>
 
           {/* Imagen con animación */}
-          <div className="relative z-50 mt-10">
+          <div className="relative z-50 mt-10 md:mt-4">
             <img
               src={imageUrl}
               alt={name}
@@ -144,14 +141,14 @@ const PokemonDetail: React.FC<PokemonDetailProps> = ({
         </div>
 
         <div
-          className="relative w-full flex-grow rounded-t-3xl bg-white p-6"
+          className="relative w-full flex-grow rounded-t-3xl bg-white p-6 md:w-1/2 md:rounded-t-none md:rounded-r-3xl"
           style={{ zIndex: 1, border: `8px solid ${mainColor}`, margin: 0 }}
         >
-          <div className="mb-6 text-center" style={{ marginTop: '8rem' }}>
+          <div className="mb-6 text-center md:text-left mt-32 md:mt-2">
             <h3 className="mb-2 text-lg font-bold" style={{ color: mainColor }}>
               About
             </h3>
-            <div className="mb-4 flex items-center justify-around border-b pb-4">
+            <div className="mb-4 flex items-center justify-around border-b pb-4 md:justify-start">
               <div className="flex flex-col items-center border-r border-gray-300 pr-9 text-gray-700">
                 <span>{(weight / 10).toFixed(1)} kg</span>
                 <span className="text-sm">Weight</span>
@@ -173,13 +170,13 @@ const PokemonDetail: React.FC<PokemonDetailProps> = ({
 
           <div className="w-full">
             <h3
-              className="mb-4 text-center text-lg font-bold"
+              className="mb-4 text-center md:text-left text-lg font-bold"
               style={{ color: mainColor }}
             >
               Base Stats
             </h3>
             <div className="relative flex flex-col space-y-4">
-              <div className="absolute bottom-0 left-16 top-0 border-r-2 border-gray-300"></div>
+              <div className="absolute bottom-0 left-16 top-0 border-r-2 border-gray-300 md:left-0"></div>
               {stats.map((stat) => (
                 <div
                   key={stat.stat.name}
